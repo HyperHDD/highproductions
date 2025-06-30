@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High Productions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4eee8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #7d5a50;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .section, .form-section {
+      background: #fff8f0;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      animation: slideUp 0.6s ease forwards;
+    }
+
+    button, select, input, textarea {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #d9a76c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .device-selector, .event-selector {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .device-selector button, .event-selector button {
+      width: 150px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>High Productions</h1>
+
+  <div class="section" id="deviceSection">
+    <h2>¿Dónde vas a usarlo?</h2>
+    <div class="device-selector">
+      <button type="button" id="btnPC">PC</button>
+      <button type="button" id="btnMobile">Celular</button>
+    </div>
+  </div>
+
+  <div class="section hidden" id="eventSection">
+    <h2>Seleccioná el tipo de evento</h2>
+    <div class="event-selector">
+      <button type="button" onclick="showForm('birthday')">Cumpleaños</button>
+      <button type="button" onclick="showForm('amplification')">Amplificación</button>
+      <button type="button" onclick="showForm('dj')">Solo servicio DJ</button>
+    </div>
+  </div>
+
+  <form id="birthdayForm" class="form-section hidden" onsubmit="return false;">
+    <h3>Formulario Cumpleaños</h3>
+    <label>Edad del cumpleañero/a <input type="number" name="edad"></label>
+    <label>Cantidad de invitados <input type="number" name="invitados"></label>
+    <label>Salón <input type="text" name="salon"></label>
+    <label>Ciudad <input type="text" name="ciudad"></label>
+    <label>Canción de entrada <input type="text" name="entrada"></label>
+    <label>Género o canción que no desea <input type="text" name="noDeseado"></label>
+    <label>Género de música para la comida
+      <select name="generoComida">
+        <option value="rock">Rock</option>
+        <option value="pop">Pop Latino</option>
+        <option value="samba">Samba</option>
+        <option value="clasicos">70s 80s 90s</option>
+      </select>
+    </label>
+    <label>¿Hay cotillón? <select name="cotillon"><option>Sí</option><option>No</option></select></label>
+    <label>¿Viene banda/artista invitado? <input type="text" name="artista"></label>
+    <label>Dato extra <textarea name="extra"></textarea></label>
+    <label>Nombre o apodo <input type="text" name="nombre"></label>
+    <label>Hora inicio <input type="time" name="inicio"></label>
+    <label>Hora fin <input type="time" name="fin"></label>
+    <button type="button" onclick="generatePDF('birthdayForm')">Generar PDF</button>
+  </form>
+
+  <form id="amplificationForm" class="form-section hidden" onsubmit="return false;">
+    <h3>Formulario Amplificación</h3>
+    <label>Cantidad de personas
+      <select name="personas">
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="200">200</option>
+        <option value="500+">500+</option>
+      </select>
+    </label>
+    <label>¿Requiere iluminación? <select name="iluminacion"><option>Sí</option><option>No</option></select></label>
+    <label>¿Requiere monitoreo para los artistas? <select name="monitoreo"><option>Sí</option><option>No</option></select></label>
+    <label>Artistas que se presentan <input type="text" name="artistas"></label>
+    <label>¿Cuántos artistas? <input type="number" name="cantidadArtistas"></label>
+    <button type="button" onclick="generatePDF('amplificationForm')">Generar PDF</button>
+  </form>
+
+  <form id="djForm" class="form-section hidden" onsubmit="return false;">
+    <h3>Formulario Solo DJ</h3>
+    <label>Lugar <input type="text" name="lugar"></label>
+    <label>Ciudad <input type="text" name="ciudad"></label>
+    <label>Hora inicio <input type="time" name="inicio"></label>
+    <button type="button" onclick="generatePDF('djForm')">Generar PDF</button>
+  </form>
+
+  <script>
+    function showEventSection() {
+      document.getElementById('deviceSection').classList.add('hidden');
+      document.getElementById('eventSection').classList.remove('hidden');
+    }
+
+    function showForm(type) {
+      const forms = ['birthdayForm', 'amplificationForm', 'djForm'];
+      forms.forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(type + 'Form').classList.remove('hidden');
+    }
+
+    async function generatePDF(formId) {
+      const form = document.getElementById(formId);
+      const formData = new FormData(form);
+      let text = 'High Productions - ' + form.querySelector('h3').textContent + '\n\n';
+
+      for (const [key, value] of formData.entries()) {
+        const label = form.querySelector(`[name="${key}"]`).closest('label').textContent.trim();
+        text += `${label}: ${value}\n`;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text(text, 10, 10);
+      doc.save('evento_high_productions.pdf');
+    }
+
+    document.getElementById('btnPC').addEventListener('click', showEventSection);
+    document.getElementById('btnMobile').addEventListener('click', showEventSection);
+  </script>
+</body>
+</html>
